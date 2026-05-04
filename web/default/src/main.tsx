@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { getStatus } from '@/lib/api'
 import '@/lib/dayjs'
+import { DEFAULT_LOGO, DEFAULT_SYSTEM_NAME } from '@/lib/constants'
 import { applyFaviconToDom } from '@/lib/dom-utils'
 import { handleServerError } from '@/lib/handle-server-error'
 import { DirectionProvider } from './context/direction-provider'
@@ -95,6 +96,37 @@ const rootElement = document.getElementById('root')!
 ;(function initSystemBranding() {
   try {
     if (typeof window === 'undefined' || typeof document === 'undefined') return
+    const normalizeSystemName = (name: unknown) => {
+      const value = typeof name === 'string' ? name.trim() : ''
+      if (!value) return DEFAULT_SYSTEM_NAME
+
+      const normalized = value.toLowerCase()
+      if (
+        normalized.includes('new api') ||
+        normalized.includes('new-api') ||
+        normalized.includes('newapi') ||
+        normalized.includes('ai gateway')
+      ) {
+        return DEFAULT_SYSTEM_NAME
+      }
+
+      return value
+    }
+    const normalizeLogoUrl = (logo: unknown) => {
+      const value = typeof logo === 'string' ? logo.trim() : ''
+      if (!value) return DEFAULT_LOGO
+
+      const normalized = value.toLowerCase()
+      if (
+        normalized === '/logo.png' ||
+        normalized.endsWith('/logo.png') ||
+        normalized.endsWith('/new-api/logo.png')
+      ) {
+        return DEFAULT_LOGO
+      }
+
+      return value
+    }
     const apply = (name: string) => {
       document.title = name
       const metaTitle = document.querySelector(
@@ -107,8 +139,8 @@ const rootElement = document.getElementById('root')!
       const saved = localStorage.getItem('status')
       if (saved) {
         const s = JSON.parse(saved)
-        if (s?.system_name) apply(s.system_name)
-        if (s?.logo) applyFaviconToDom(s.logo)
+        apply(normalizeSystemName(s?.system_name))
+        applyFaviconToDom(normalizeLogoUrl(s?.logo))
       }
     } catch {
       /* empty */
@@ -116,15 +148,22 @@ const rootElement = document.getElementById('root')!
     // Background refresh
     getStatus()
       .then((s) => {
-        if (s?.system_name) {
-          apply(s.system_name as string)
-          try {
-            localStorage.setItem('status', JSON.stringify(s))
-          } catch {
-            /* empty */
-          }
+        const nextName = normalizeSystemName(s?.system_name)
+        const nextLogo = normalizeLogoUrl(s?.logo)
+        apply(nextName)
+        try {
+          localStorage.setItem(
+            'status',
+            JSON.stringify({
+              ...s,
+              system_name: nextName,
+              logo: nextLogo,
+            })
+          )
+        } catch {
+          /* empty */
         }
-        if (s?.logo) applyFaviconToDom(s.logo as string)
+        applyFaviconToDom(nextLogo)
       })
       .catch(() => {
         /* empty */

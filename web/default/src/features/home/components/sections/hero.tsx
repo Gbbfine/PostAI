@@ -22,9 +22,9 @@ export function Hero(props: HeroProps) {
         className='pointer-events-none absolute inset-0 -z-10 opacity-25 dark:opacity-[0.12]'
         style={{
           background: [
-            'radial-gradient(ellipse 60% 50% at 20% 20%, oklch(0.72 0.18 250 / 80%) 0%, transparent 70%)',
-            'radial-gradient(ellipse 50% 40% at 80% 15%, oklch(0.65 0.15 200 / 60%) 0%, transparent 70%)',
-            'radial-gradient(ellipse 40% 35% at 40% 80%, oklch(0.70 0.12 280 / 40%) 0%, transparent 70%)',
+            'radial-gradient(ellipse 60% 50% at 18% 18%, oklch(0.72 0.18 28 / 78%) 0%, transparent 70%)',
+            'radial-gradient(ellipse 52% 42% at 82% 14%, oklch(0.68 0.13 205 / 55%) 0%, transparent 72%)',
+            'radial-gradient(ellipse 42% 36% at 45% 82%, oklch(0.78 0.15 82 / 32%) 0%, transparent 72%)',
           ].join(', '),
         }}
       />
@@ -41,7 +41,7 @@ export function Hero(props: HeroProps) {
         >
           {t('Unified API Gateway for')}
           <br />
-          <span className='bg-gradient-to-r from-blue-400 via-violet-400 to-purple-500 bg-clip-text text-transparent'>
+          <span className='bg-gradient-to-r from-orange-400 via-rose-500 to-amber-400 bg-clip-text text-transparent'>
             {t('All Your AI Models')}
           </span>
         </h1>

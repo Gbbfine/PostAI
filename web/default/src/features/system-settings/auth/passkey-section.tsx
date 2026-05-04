@@ -3,6 +3,8 @@ import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
+import { DEFAULT_SYSTEM_NAME } from '@/lib/constants'
+import { useSystemConfig } from '@/hooks/use-system-config'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -49,7 +51,9 @@ interface PasskeySectionProps {
 
 export function PasskeySection({ defaultValues }: PasskeySectionProps) {
   const { t } = useTranslation()
+  const { systemName } = useSystemConfig()
   const updateOption = useUpdateOption()
+  const brandName = systemName?.trim() || DEFAULT_SYSTEM_NAME
 
   const formDefaults = useMemo<PasskeyFormValues>(
     () => ({
@@ -176,7 +180,9 @@ export function PasskeySection({ defaultValues }: PasskeySectionProps) {
                 <FormLabel>{t('Relying Party Display Name')}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={t('e.g. New API Console')}
+                    placeholder={t('e.g. {{brand}} Console', {
+                      brand: brandName,
+                    })}
                     {...field}
                     value={field.value ?? ''}
                   />

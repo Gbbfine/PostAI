@@ -31,6 +31,39 @@ interface StatusApiResponse {
   }
 }
 
+function normalizeSystemName(name: unknown): string {
+  const value = typeof name === 'string' ? name.trim() : ''
+  if (!value) return DEFAULT_SYSTEM_NAME
+
+  const normalized = value.toLowerCase()
+  if (
+    normalized.includes('new api') ||
+    normalized.includes('new-api') ||
+    normalized.includes('newapi') ||
+    normalized.includes('ai gateway')
+  ) {
+    return DEFAULT_SYSTEM_NAME
+  }
+
+  return value
+}
+
+function normalizeLogoUrl(logo: unknown): string {
+  const value = typeof logo === 'string' ? logo.trim() : ''
+  if (!value) return DEFAULT_LOGO
+
+  const normalized = value.toLowerCase()
+  if (
+    normalized === '/logo.png' ||
+    normalized.endsWith('/logo.png') ||
+    normalized.endsWith('/new-api/logo.png')
+  ) {
+    return DEFAULT_LOGO
+  }
+
+  return value
+}
+
 function toNumber(value: unknown, fallback: number): number {
   if (typeof value === 'number' && !Number.isNaN(value)) return value
   if (typeof value === 'string') {
@@ -74,8 +107,8 @@ export function mapStatusDataToConfig(
   }
 
   return {
-    systemName: data.system_name || DEFAULT_SYSTEM_NAME,
-    logo: data.logo || DEFAULT_LOGO,
+    systemName: normalizeSystemName(data.system_name),
+    logo: normalizeLogoUrl(data.logo),
     footerHtml: data.footer_html,
     demoSiteEnabled: data.demo_site_enabled,
     displayTokenStatEnabled: data.display_token_stat_enabled,
@@ -132,6 +165,8 @@ export function useSystemConfig(options: UseSystemConfigOptions = {}) {
     setLoadedLogoUrl,
     setLoading,
   } = useSystemConfigStore()
+  const normalizedSystemName = normalizeSystemName(config.systemName)
+  const normalizedLogo = normalizeLogoUrl(config.logo)
 
   // Load config from backend
   const loadConfig = useCallback(async () => {
@@ -151,9 +186,27 @@ export function useSystemConfig(options: UseSystemConfigOptions = {}) {
     if (autoLoad) loadConfig()
   }, [autoLoad, loadConfig])
 
+  useEffect(() => {
+    if (
+      normalizedSystemName !== config.systemName ||
+      normalizedLogo !== config.logo
+    ) {
+      setConfig({
+        systemName: normalizedSystemName,
+        logo: normalizedLogo,
+      })
+    }
+  }, [
+    config.logo,
+    config.systemName,
+    normalizedLogo,
+    normalizedSystemName,
+    setConfig,
+  ])
+
   // Preload logo image when URL changes
   useEffect(() => {
-    const { logo } = config
+    const logo = normalizedLogo
 
     // Skip if logo is already loaded
     if (!logo || logo === loadedLogoUrl) return
@@ -175,11 +228,13 @@ export function useSystemConfig(options: UseSystemConfigOptions = {}) {
       }
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config.logo, loadedLogoUrl, setLoadedLogoUrl])
+  }, [loadedLogoUrl, normalizedLogo, setLoadedLogoUrl])
 
   return {
     ...config,
+    systemName: normalizedSystemName,
+    logo: normalizedLogo,
     loading,
-    logoLoaded: config.logo === loadedLogoUrl && !!loadedLogoUrl,
+    logoLoaded: normalizedLogo === loadedLogoUrl && !!loadedLogoUrl,
   }
 }

@@ -2,6 +2,8 @@ import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
+import { DEFAULT_SYSTEM_NAME } from '@/lib/constants'
+import { useSystemConfig } from '@/hooks/use-system-config'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -47,8 +49,10 @@ export function EmailSettingsSection({
   defaultValues,
 }: EmailSettingsSectionProps) {
   const { t } = useTranslation()
+  const { systemName } = useSystemConfig()
   const updateOption = useUpdateOption()
   const emailSchema = createEmailSchema(t)
+  const brandName = systemName?.trim() || DEFAULT_SYSTEM_NAME
 
   const form = useForm<EmailFormValues>({
     resolver: zodResolver(emailSchema),
@@ -254,7 +258,9 @@ export function EmailSettingsSection({
                 <FormControl>
                   <Input
                     autoComplete='off'
-                    placeholder={t('New API &lt;noreply@example.com&gt;')}
+                    placeholder={t('{{brand}} &lt;noreply@example.com&gt;', {
+                      brand: brandName,
+                    })}
                     {...field}
                     onChange={(event) => field.onChange(event.target.value)}
                   />

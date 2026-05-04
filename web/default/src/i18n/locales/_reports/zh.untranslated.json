@@ -1,7 +1,9 @@
 {
   "\"default\": \"us-central1\", \"claude-3-5-sonnet-20240620\": \"europe-west1\"": "\"default\": \"us-central1\", \"claude-3-5-sonnet-20240620\": \"europe-west1\"",
+  "(c) 2025 Your Company. All rights reserved.": "(c) 2025 Your Company. All rights reserved.",
   "[{\"ChatGPT\":\"https://chat.openai.com\"},{\"Lobe Chat\":\"https://chat-preview.lobehub.com/?settings={...}\"}]": "[{\"ChatGPT\":\"https://chat.openai.com\"},{\"Lobe Chat\":\"https://chat-preview.lobehub.com/?settings={...}\"}]",
   "{\"original-model\": \"replacement-model\"}": "{\"original-model\": \"replacement-model\"}",
+  "{{brand}} &lt;noreply@example.com&gt;": "{{brand}} &lt;noreply@example.com&gt;",
   "/status/": "/status/",
   "/your/endpoint": "/your/endpoint",
   "AccessKey / SecretAccessKey": "AccessKey / SecretAccessKey",
