@@ -1,5 +1,7 @@
+# syntax=docker/dockerfile:1.7
+
 # Backend-only build for frontend development
-# Skips frontend build, uses a placeholder for //go:embed web/dist
+# Skips frontend build and embeds placeholder pages for the Go web assets.
 
 FROM golang:1.26.1-alpine AS builder
 
@@ -12,7 +14,9 @@ ENV GOEXPERIMENT=greenteagc
 WORKDIR /build
 
 ADD go.mod go.sum ./
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go mod download
 
 COPY . .
 
@@ -20,14 +24,13 @@ RUN mkdir -p web/default/dist web/classic/dist && \
     echo '<!doctype html><html><head><title>dev</title></head><body>use frontend dev server</body></html>' > web/default/dist/index.html && \
     echo '<!doctype html><html><head><title>dev</title></head><body>use frontend dev server</body></html>' > web/classic/dist/index.html
 
-RUN go build -ldflags "-s -w -X 'github.com/QuantumNous/new-api/common.Version=$(cat VERSION)'" -o new-api
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go build -ldflags "-s -w -X '\''github.com/QuantumNous/new-api/common.Version=$(cat VERSION)'\''" -o new-api
 
-FROM debian:bookworm-slim
+FROM alpine:3.22
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates tzdata wget \
-    && rm -rf /var/lib/apt/lists/* \
-    && update-ca-certificates
+RUN apk add --no-cache ca-certificates tzdata wget
 
 COPY --from=builder /build/new-api /
 EXPOSE 3000

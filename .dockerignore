@@ -1,3 +1,4 @@
+.agents
 .github
 .git
 *.md
@@ -7,4 +8,11 @@ Makefile
 docs
 .eslintcache
 .gocache
-/web/node_modules
+bin
+data
+electron
+logs
+web/node_modules
+web/default/node_modules
+web/default/dist
+web/classic
